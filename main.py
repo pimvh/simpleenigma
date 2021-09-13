@@ -5,20 +5,21 @@ from typing import Text
 import string
 import time 
 
-from parts import Wheel, StaticWheel
+from parts import Rotor, StaticRotor, StekkerBrett
 
 class Enigma():
-    def __init__(self, wheels : list[Wheel]):        
-        self.wheels = wheels
+    def __init__(self, rotors : list[Rotor], stekkerbret : StekkerBrett):        
+        self.rotors = rotors
+        self.stekkerbret = stekkerbret
 
 
     def get_state(self) -> list[OrderedDict]:
-        return [wheel.dump_settings() for wheel in self.wheels]
+        return [rotor.dump_settings() for rotor in self.rotors]
     
 
     def set_state(self, settings) -> None:
-        for wheel, setting in zip(self.wheels, settings):
-            wheel.set_settings(setting)
+        for rotor, setting in zip(self.rotors, settings):
+            rotor.set_settings(setting)
 
 
     def encode(self, text_to_encode : Text) -> Text:
@@ -69,29 +70,33 @@ class Enigma():
 
         turn_next = True
 
-        for i, current_wheel in enumerate(self.wheels):
+        for i, current_rotor in enumerate(self.rotors):
 
             if turn_next:
-                # print(f'wheel {i} turned')
-                turn_next = current_wheel.turn()
+                # print(f'rotor {i} turned')
+                turn_next = current_rotor.turn()
                 
-            char = current_wheel.get_encoded_char(char)
+            char = current_rotor.get_encoded_char(char)
         
+        char = self.stekkerbret.get_encoded_char(char)
+
         return char
     
     def decode_character(self, char : str):
         ''' parse a single character '''
 
+        char = self.stekkerbret.get_decoded_char(char)
+
         turn_next = True
 
-        for i, current_wheel in enumerate(self.wheels):
+        for i, current_rotor in enumerate(self.rotors):
 
             if turn_next:
-                # print(f'wheel {i} turned')
-                turn_next = current_wheel.turn()
+                # print(f'rotor {i} turned')
+                turn_next = current_rotor.turn()
                 
-        for i, current_wheel in enumerate(reversed(self.wheels)):
-            char = current_wheel.get_decoded_char(char)
+        for i, current_rotor in enumerate(reversed(self.rotors)):
+            char = current_rotor.get_decoded_char(char)
     
         return char
 
@@ -100,18 +105,23 @@ class Enigma():
 
 def main() -> None:
 
-    wheels = []
+    rotors = []
+    stekkerbrett = StekkerBrett()
 
     for i in range(10):
-        wheels.append(Wheel())
+        rotors.append(Rotor())
 
-    decoder_wheels = [copy.deepcopy(x) for x in wheels]    
+    print(rotors[0])
 
-    enigma = Enigma(wheels)
-    enigma_decoder = Enigma(decoder_wheels)
+    rotors.append(StaticRotor())
 
-    # plaintext = 'test'
-    plaintext = '''I've tried my hand a simple Enigma encoder/decoder. I think it works.'''
+    decoder_rotors = [copy.deepcopy(x) for x in rotors]    
+    decoder_stekkerbrett = copy.deepcopy(stekkerbrett)
+
+    enigma = Enigma(rotors, stekkerbrett)
+    enigma_decoder = Enigma(decoder_rotors, decoder_stekkerbrett)
+
+    plaintext = '''Hoi dit is enigma'''
     print(f'{plaintext=}')
 
     encoded = enigma.encode(plaintext)

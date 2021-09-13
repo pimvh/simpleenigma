@@ -4,11 +4,11 @@ from itertools import islice, cycle
 from .alphabetmapping import AlphabetMapping
 
 
-class Wheel(AlphabetMapping):
-    """ defines a wheel of an enigma machine """
+class Rotor(AlphabetMapping):
+    """ defines a rotor of an enigma machine """
     def __init__(self) -> None:
         super().__init__()
-        self.wheelsize = len(self.mapping)
+        self.rotorsize = len(self.mapping)
         self.state = 0
         self.full_turns = 0
         self.shift = 1
@@ -29,7 +29,7 @@ class Wheel(AlphabetMapping):
 
 
     def turn(self) -> bool:
-        ''' turn the wheel 1 spot, return True when the wheel is fully turned '''
+        ''' turn the rotor 1 spot, return True when the rotor is fully turned '''
         self.state += self.shift
 
         self.mapping = OrderedDict(
@@ -45,7 +45,7 @@ class Wheel(AlphabetMapping):
         # print(self.reverse_mapping.get('n'))
         assert decoded == 'a'
 
-        if self.state > self.wheelsize:
+        if self.state > self.rotorsize:
             self.state = 0
             self.full_turns += 1
             return True
@@ -60,8 +60,8 @@ class Wheel(AlphabetMapping):
         self.mapping = mapping
 
 
-class StaticWheel(Wheel):
-    """ defines a static wheel of an enigma machine """
+class StaticRotor(Rotor):
+    """ defines a static rotor of an enigma machine """
     def __init__(self) -> None:
         super().__init__()
     

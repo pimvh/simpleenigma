@@ -1,1 +1,2 @@
-from .wheel import Wheel, StaticWheel
+from .rotor import Rotor, StaticRotor
+from .stekkerbrett import StekkerBrett
